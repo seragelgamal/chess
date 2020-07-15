@@ -9,10 +9,18 @@ div {
 }
 
 #board {
-    float: none;
+    /* float: none; */
     width: 800px;
 }
 
 .white {
     background-color: white;
+}
+
+.black {
+    background-color: black;
+}
+
+img {
+    width: 98px;
 }

@@ -1,0 +1,18 @@
+* {
+    text-align: center;
+}
+
+div {
+    float: left;
+    width: 98px;
+    border: 1px solid black;
+}
+
+#board {
+    float: none;
+    width: 800px;
+}
+
+.white {
+    background-color: white;
+}

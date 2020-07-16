@@ -26,3 +26,13 @@ div {
 img {
     width: 98px;
 }
+
+.highlighted {
+    border: 10px solid yellow;
+    width: 80px;
+    height: 80px;
+}
+
+.highlighted img {
+    width: 80px;
+}

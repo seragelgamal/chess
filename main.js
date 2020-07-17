@@ -228,22 +228,26 @@ let whiteTurn = true;
 let gameStatus = 0;
 
 let activeSquares = [];
+let pieceToMove;
 
 let squareElements = document.querySelectorAll('.white, .brown');
 
 for (let i = 0; i < squareElements.length; i++) {
     squareElements[i].addEventListener('mouseenter', mouseEnterHandler);
+    squareElements[i].addEventListener('click', clickHandler);
 }
 
 function mouseEnterHandler(event) {
     if (gameStatus == 0 && whiteTurn) {
         if (event.target.dataset.piece == 'Pawn' && event.target.dataset.pieceColour == 'white' && !whitePawns[event.target.dataset.number].moved) {
+            pieceToMove = event.target;
             highlightPossibleMoves(event, 'unmoved' + event.target.dataset.piece);
         } else if (event.target.dataset.pieceColour == 'white') {
             highlightPossibleMoves(event, event.target.dataset.piece);
         }
     } else if (gameStatus == 0 && !whiteTurn) {
         if (event.target.dataset.piece == 'Pawn' && event.target.dataset.pieceColour == 'black' && !blackPawns[event.target.dataset.number].moved) {
+            pieceToMove = event.target;
             highlightPossibleMoves(event, 'unmoved' + event.target.dataset.piece);
         }
     } else if (gameStatus == 1) {
@@ -251,9 +255,7 @@ function mouseEnterHandler(event) {
             for (let i = 0; i < squareElements.length; i++) {
                 squareElements[i].classList.remove('highlighted');
             }
-            for (let i = 0; i < activeSquares.length; i++) {
-                activeSquares.pop();
-            }
+            activeSquares = [];
             gameStatus = 0;
             mouseEnterHandler(event);
         }
@@ -296,7 +298,7 @@ function highlightPossibleMoves(event, piece) {
                 activeSquares.push(document.getElementById(row + '-' + column));
             } else {
                 column = Number(event.target.dataset.column) + 1;
-                if ((document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black')) {
+                if ((document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black')) {
                     document.getElementById(row + '-' + column).classList.add('highlighted');
                     activeSquares.push(document.getElementById(row + '-' + column));
                 }
@@ -345,4 +347,32 @@ function highlightPossibleMoves(event, piece) {
         }
     }
     gameStatus = 1;
+}
+
+function clickHandler(event) {
+    if (gameStatus == 1 && activeSquares.includes(event.target)) {
+        if (pieceToMove.dataset.piece == 'Pawn') {
+            if (pieceToMove.dataset.pieceColour == 'white' && !whitePawns[pieceToMove.dataset.number].moved) {
+                whitePawns[pieceToMove.dataset.number].moved = true;
+            } else if (!blackPawns[pieceToMove.dataset.number].moved) {
+                blackPawns[pieceToMove.dataset.number].moved = true;
+            }
+        }
+        event.target.dataset.piece = pieceToMove.dataset.piece;
+        event.target.dataset.pieceColour = pieceToMove.dataset.pieceColour;
+        event.target.innerHTML = pieceToMove.innerHTML;
+        if (pieceToMove.dataset.number != undefined) {
+            event.target.dataset.number = pieceToMove.dataset.number;
+        }
+        pieceToMove.dataset.piece = 'Empty';
+        pieceToMove.dataset.pieceColour = undefined;
+        pieceToMove.innerHTML = '';
+        whiteTurn = !whiteTurn;
+        gameStatus = 0;
+        activeSquares = [];
+
+        for (let i = 0; i < squareElements.length; i++) {
+            squareElements[i].classList.remove('highlighted');
+        }
+    }
 }

@@ -225,36 +225,124 @@ document.getElementById('7-2').dataset.number = 0;
 document.getElementById('7-5').dataset.number = 1;
 
 let whiteTurn = true;
+let gameStatus = 0;
+
+let activeSquares = [];
 
 let squareElements = document.querySelectorAll('.white, .brown');
 
 for (let i = 0; i < squareElements.length; i++) {
     squareElements[i].addEventListener('mouseenter', mouseEnterHandler);
-    squareElements[i].addEventListener('mouseleave', mouseLeaveHandler);
 }
 
 function mouseEnterHandler(event) {
-    // console.log(e.target);
-    if (whiteTurn) {
+    if (gameStatus == 0 && whiteTurn) {
         if (event.target.dataset.piece == 'Pawn' && event.target.dataset.pieceColour == 'white' && !whitePawns[event.target.dataset.number].moved) {
             highlightPossibleMoves(event, 'unmoved' + event.target.dataset.piece);
+        } else if (event.target.dataset.pieceColour == 'white') {
+            highlightPossibleMoves(event, event.target.dataset.piece);
         }
-    } else {
-
-    }
-}
-
-function mouseLeaveHandler(event) {
-    for (let i = 0; i < squareElements.length; i++) {
-        squareElements[i].classList.remove('highlighted');
+    } else if (gameStatus == 0 && !whiteTurn) {
+        if (event.target.dataset.piece == 'Pawn' && event.target.dataset.pieceColour == 'black' && !blackPawns[event.target.dataset.number].moved) {
+            highlightPossibleMoves(event, 'unmoved' + event.target.dataset.piece);
+        }
+    } else if (gameStatus == 1) {
+        if (!activeSquares.includes(event.target)) {
+            for (let i = 0; i < squareElements.length; i++) {
+                squareElements[i].classList.remove('highlighted');
+            }
+            for (let i = 0; i < activeSquares.length; i++) {
+                activeSquares.pop();
+            }
+            gameStatus = 0;
+            mouseEnterHandler(event);
+        }
     }
 }
 
 function highlightPossibleMoves(event, piece) {
-    if (piece == 'unmovedPawn') {
-        for (let row = event.target.dataset.row; row > event.target.dataset.row - 2;) {
-            row--;
-            document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
+    if (whiteTurn) {
+        if (piece == 'unmovedPawn') {
+            let row = Number(event.target.dataset.row) - 1;
+            if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
+                document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
+                row--;
+                if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
+                    document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
+                    activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
+                }
+            }
+            row = Number(event.target.dataset.row) - 1;
+            let column = Number(event.target.dataset.column) - 1;
+            if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black') {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            }
+            column = Number(event.target.dataset.column) + 1;
+            if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black') {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            }
+        } else if (piece == 'Pawn') {
+            let row = Number(event.target.dataset.row) - 1;
+            if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
+                document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
+            }
+            let column = Number(event.target.dataset.column) - 1;
+            if (document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black') {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            } else {
+                column = Number(event.target.dataset.column) + 1;
+                if ((document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black')) {
+                    document.getElementById(row + '-' + column).classList.add('highlighted');
+                    activeSquares.push(document.getElementById(row + '-' + column));
+                }
+            }
+        }
+    } else {
+        if (piece == 'unmovedPawn') {
+            let row = Number(event.target.dataset.row) + 1;
+            if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
+                document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
+                row++;
+                if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
+                    document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
+                    activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
+                }
+            }
+            row = Number(event.target.dataset.row) + 1;
+            let column = Number(event.target.dataset.column) - 1;
+            if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white') {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            }
+            column = Number(event.target.dataset.column) + 1;
+            if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white') {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            }
+        } else if (piece == 'Pawn') {
+            let row = Number(event.target.dataset.row) + 1;
+            if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
+                document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
+            }
+            let column = Number(event.target.dataset.column) - 1;
+            if (document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white') {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            } else {
+                column = Number(event.target.dataset.column) + 1;
+                if ((document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white')) {
+                    document.getElementById(row + '-' + column).classList.add('highlighted');
+                    activeSquares.push(document.getElementById(row + '-' + column));
+                }
+            }
         }
     }
+    gameStatus = 1;
 }

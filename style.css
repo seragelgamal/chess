@@ -2,7 +2,18 @@
     text-align: center;
 }
 
-div {
+.left {
+    float: left;
+    width: 50%;
+}
+
+.right {
+    float: right;
+    text-align: center;
+    width: 50%;
+}
+
+.white, .brown {
     float: left;
     width: 98px;
     height: 98px;
@@ -10,9 +21,9 @@ div {
 }
 
 #board {
-    /* float: none; */
     width: 800px;
     height: 800px;
+    display: block;
 }
 
 .white {
@@ -35,4 +46,9 @@ img {
 
 .highlighted img {
     width: 80px;
+}
+
+p {
+    font-size: xx-large;
+    display: block;
 }

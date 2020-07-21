@@ -318,6 +318,38 @@ function highlightPossibleMoves(event, piece) {
         }
         pieceToMove = event.target;
     }
+    if (piece == 'Rook') {
+        let status = true;
+        let row;
+        let column = Number(event.target.dataset.column);
+        for (row = Number(event.target.dataset.row) - 1; row >= 0; row--) {
+            if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+                status = false;
+            } else {
+                status = false;
+            }
+        }
+        status = true;
+        for (row = Number(event.target.dataset.row) + 1; row < 8; row++) {
+            if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+                status = false;
+            } else {
+                status = false;
+            }
+        }
+        pieceToMove = event.target;
+        gameStatus = 1;
+    }
 }
 
 function clickHandler(event) {

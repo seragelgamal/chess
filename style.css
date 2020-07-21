@@ -4,13 +4,13 @@
 
 .left {
     float: left;
-    width: 50%;
+    width: 80%;
 }
 
 .right {
     float: right;
     text-align: center;
-    width: 50%;
+    width: 20%;
 }
 
 .white, .brown {

@@ -347,13 +347,92 @@ function highlightPossibleMoves(event, piece) {
                 status = false;
             }
         }
+        status = true;
+        row = Number(event.target.dataset.row);
+        for (column = Number(event.target.dataset.column) - 1; column >= 0; column--) {
+            if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+                status = false;
+            } else {
+                status = false;
+            }
+        }
+        status = true;
+        for (column = Number(event.target.dataset.column) + 1; column < 8; column++) {
+            if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+                status = false;
+            } else {
+                status = false;
+            }
+        }
+        status = true;
         pieceToMove = event.target;
         gameStatus = 1;
+    } else if (piece == 'Knight') {
+        let row = Number(event.target.dataset.row) - 2;
+        let column = Number(event.target.dataset.column) + 1;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+            // document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row = Number(event.target.dataset.row) - 1;
+        column = Number(event.target.dataset.column) + 2;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+            // document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row = Number(event.target.dataset.row) + 1;
+        column = Number(event.target.dataset.column) + 2;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+            // document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row = Number(event.target.dataset.row) + 2;
+        column = Number(event.target.dataset.column) + 1;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+            // document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row = Number(event.target.dataset.row) + 2;
+        column = Number(event.target.dataset.column) - 1;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+            // document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row = Number(event.target.dataset.row) - 1;
+        column = Number(event.target.dataset.column) - 2;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+            // document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row = Number(event.target.dataset.row) - 2;
+        column = Number(event.target.dataset.column) - 1;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+            // document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        // gameStatus = 1;
     }
 }
 
 function clickHandler(event) {
-    let targetElement;
+    if (gameStatus == 0) {
+        for (let i = 0; i < activeSquares.length; i++) {
+            activeSquares[i].classList.add('highlighted');
+        }
+        gameStatus = 1;
+        clickHandler(event);
+    } else {
+let targetElement;
     if (event.target.tagName == 'IMG') {
         targetElement = event.target.parentNode;
     } else {
@@ -393,4 +472,8 @@ function clickHandler(event) {
         }
         mouseEnterHandler(event);
     }
+    }
+    
+
+    
 }

@@ -23,22 +23,14 @@ let boardArray = [
 
 let numberLegend = ['Empty', 'Pawn', 'Rook', 'Knight', 'Bishop', 'Queen', 'King'];
 
-let blackPawns = [];
+let blackPawnBooleans = [];
 for (let column = 0; column < 8; column++) {
-    blackPawns.push({
-        row: 1,
-        column: column,
-        moved: false
-    });
+    blackPawnBooleans.push(false);
 }
 
-let whitePawns = [];
+let whitePawnBooleans = [];
 for (let column = 0; column < 8; column++) {
-    whitePawns.push({
-        row: 6,
-        column: column,
-        moved: false
-    });
+    whitePawnBooleans.push(false);
 }
 
 for (let row = 0; row < 8; row++) {
@@ -102,20 +94,6 @@ for (let row = 6; row < 8; row++) {
     }
 }
 
-document.getElementById('0-0').dataset.number = 0;
-document.getElementById('0-7').dataset.number = 1;
-document.getElementById('0-1').dataset.number = 0;
-document.getElementById('0-6').dataset.number = 1;
-document.getElementById('0-2').dataset.number = 0;
-document.getElementById('0-5').dataset.number = 1;
-
-document.getElementById('7-0').dataset.number = 0;
-document.getElementById('7-7').dataset.number = 1;
-document.getElementById('7-1').dataset.number = 0;
-document.getElementById('7-6').dataset.number = 1;
-document.getElementById('7-2').dataset.number = 0;
-document.getElementById('7-5').dataset.number = 1;
-
 let whiteTurn = true;
 let gameStatus = 0;
 
@@ -125,146 +103,105 @@ let pieceToMove;
 let squareElements = document.querySelectorAll('.white, .brown');
 
 for (let i = 0; i < squareElements.length; i++) {
-    squareElements[i].addEventListener('mouseenter', mouseEnterHandler);
     squareElements[i].addEventListener('click', clickHandler);
 }
 
+let turnDisplay = document.getElementById('turn');
 let capturedPieceContainer = document.getElementById('capturedPieces');
 
-function mouseEnterHandler(event) {
-    if (gameStatus == 0 && whiteTurn) {
-        if (event.target.dataset.piece == 'Pawn' && event.target.dataset.pieceColour == 'white' && !whitePawns[event.target.dataset.number].moved) {
-            pieceToMove = event.target;
-            highlightPossibleMoves(event, 'unmoved' + event.target.dataset.piece);
-        } else if (event.target.dataset.pieceColour == 'white') {
-            pieceToMove = event.target;
-            highlightPossibleMoves(event, event.target.dataset.piece);
-        }
-    } else if (gameStatus == 0 && !whiteTurn) {
-        if (event.target.dataset.piece == 'Pawn' && event.target.dataset.pieceColour == 'black' && !blackPawns[event.target.dataset.number].moved) {
-            pieceToMove = event.target;
-            highlightPossibleMoves(event, 'unmoved' + event.target.dataset.piece);
-        } else if (event.target.dataset.pieceColour == 'black') {
-            pieceToMove = event.target;
-            highlightPossibleMoves(event, event.target.dataset.piece);
-        }
-    } else if (gameStatus == 1) {
-        if (!activeSquares.includes(event.target)) {
-            for (let i = 0; i < squareElements.length; i++) {
-                squareElements[i].classList.remove('highlighted');
-            }
-            activeSquares = [];
-            gameStatus = 0;
-            mouseEnterHandler(event);
-        }
-    }
-}
-
-function highlightPossibleMoves(event, piece) {
+function highlightPossibleMoves(targetElement, piece) {
     if (piece == 'unmovedPawn') {
         if (whiteTurn) {
-            let row = Number(event.target.dataset.row) - 1;
-            if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
-                document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
-                activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
-                gameStatus = 1;
+            let row = Number(targetElement.dataset.row) - 1;
+            if (document.getElementById(row + '-' + targetElement.dataset.column).dataset.piece == 'Empty') {
+                document.getElementById(row + '-' + targetElement.dataset.column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + targetElement.dataset.column));
                 row--;
-                if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
-                    document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
-                    activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
-                    gameStatus = 1;
+                if (document.getElementById(row + '-' + targetElement.dataset.column).dataset.piece == 'Empty') {
+                    document.getElementById(row + '-' + targetElement.dataset.column).classList.add('highlighted');
+                    activeSquares.push(document.getElementById(row + '-' + targetElement.dataset.column));
                 }
             }
-            row = Number(event.target.dataset.row) - 1;
-            let column = Number(event.target.dataset.column) - 1;
+            row = Number(targetElement.dataset.row) - 1;
+            let column = Number(targetElement.dataset.column) - 1;
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black') {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-                gameStatus = 1;
             }
-            column = Number(event.target.dataset.column) + 1;
+            column = Number(targetElement.dataset.column) + 1;
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black') {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-                gameStatus = 1;
             }
         } else {
-            let row = Number(event.target.dataset.row) + 1;
-            if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
-                document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
-                activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
-                gameStatus = 1;
+            let row = Number(targetElement.dataset.row) + 1;
+            if (document.getElementById(row + '-' + targetElement.dataset.column).dataset.piece == 'Empty') {
+                document.getElementById(row + '-' + targetElement.dataset.column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + targetElement.dataset.column));
                 row++;
-                if (document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
-                    document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
-                    activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
-                    gameStatus = 1;
+                if (document.getElementById(row + '-' + targetElement.dataset.column).dataset.piece == 'Empty') {
+                    document.getElementById(row + '-' + targetElement.dataset.column).classList.add('highlighted');
+                    activeSquares.push(document.getElementById(row + '-' + targetElement.dataset.column));
                 }
             }
-            row = Number(event.target.dataset.row) + 1;
-            let column = Number(event.target.dataset.column) - 1;
+            row = Number(targetElement.dataset.row) + 1;
+            let column = Number(targetElement.dataset.column) - 1;
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white') {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-                gameStatus = 1;
             }
-            column = Number(event.target.dataset.column) + 1;
+            column = Number(targetElement.dataset.column) + 1;
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white') {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-                gameStatus = 1;
             }
         }
+        gameStatus = 1;
     } else if (piece == 'Pawn') {
         if (whiteTurn) {
-            let row = Number(event.target.dataset.row) - 1;
-            if (document.getElementById(row + '-' + event.target.dataset.column) != null && document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
-                document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
-                activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
+            let row = Number(targetElement.dataset.row) - 1;
+            if (document.getElementById(row + '-' + targetElement.dataset.column) != null && document.getElementById(row + '-' + targetElement.dataset.column).dataset.piece == 'Empty') {
+                document.getElementById(row + '-' + targetElement.dataset.column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + targetElement.dataset.column));
             }
-            let column = Number(event.target.dataset.column) - 1;
+            let column = Number(targetElement.dataset.column) - 1;
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black') {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else {
-                column += 2;
-                if ((document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black')) {
-                    document.getElementById(row + '-' + column).classList.add('highlighted');
-                    activeSquares.push(document.getElementById(row + '-' + column));
-                }
             }
-            gameStatus = 1;
+            column += 2;
+            if ((document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black')) {
+                document.getElementById(row + '-' + column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + column));
+            }
         } else {
-            let row = Number(event.target.dataset.row) + 1;
-            if (document.getElementById(row + '-' + event.target.dataset.column) != null && document.getElementById(row + '-' + event.target.dataset.column).dataset.piece == 'Empty') {
-                document.getElementById(row + '-' + event.target.dataset.column).classList.add('highlighted');
-                activeSquares.push(document.getElementById(row + '-' + event.target.dataset.column));
-                gameStatus = 1;
+            let row = Number(targetElement.dataset.row) + 1;
+            if (document.getElementById(row + '-' + targetElement.dataset.column) != null && document.getElementById(row + '-' + targetElement.dataset.column).dataset.piece == 'Empty') {
+                document.getElementById(row + '-' + targetElement.dataset.column).classList.add('highlighted');
+                activeSquares.push(document.getElementById(row + '-' + targetElement.dataset.column));
             }
-            let column = Number(event.target.dataset.column) - 1;
+            let column = Number(targetElement.dataset.column) - 1;
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white') {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-                gameStatus = 1;
             } else {
                 column += 2;
                 if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece != 'Empty' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white') {
                     document.getElementById(row + '-' + column).classList.add('highlighted');
                     activeSquares.push(document.getElementById(row + '-' + column));
-                    gameStatus = 1;
                 }
             }
         }
-
+        gameStatus = 1;
     } else if (piece == 'Rook') {
         let status = true;
         let row;
-        let column = Number(event.target.dataset.column);
-        for (row = Number(event.target.dataset.row) - 1; row >= 0; row--) {
+        let column = Number(targetElement.dataset.column);
+        for (row = Number(targetElement.dataset.row) - 1; row >= 0; row--) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -273,11 +210,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) + 1; row < 8; row++) {
+        for (row = Number(targetElement.dataset.row) + 1; row < 8; row++) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -286,12 +223,12 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        row = Number(event.target.dataset.row);
-        for (column = Number(event.target.dataset.column) - 1; column >= 0; column--) {
+        row = Number(targetElement.dataset.row);
+        for (column = Number(targetElement.dataset.column) - 1; column >= 0; column--) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -300,11 +237,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (column = Number(event.target.dataset.column) + 1; column < 8; column++) {
+        for (column = Number(targetElement.dataset.column) + 1; column < 8; column++) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -315,51 +252,51 @@ function highlightPossibleMoves(event, piece) {
         status = true;
         gameStatus = 1;
     } else if (piece == 'Knight') {
-        let row = Number(event.target.dataset.row) - 2;
-        let column = Number(event.target.dataset.column) + 1;
-        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+        let row = Number(targetElement.dataset.row) - 2;
+        let column = Number(targetElement.dataset.column) + 1;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
-        row = Number(event.target.dataset.row) - 1;
-        column = Number(event.target.dataset.column) + 2;
-        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+        row = Number(targetElement.dataset.row) - 1;
+        column = Number(targetElement.dataset.column) + 2;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
-        row = Number(event.target.dataset.row) + 1;
-        column = Number(event.target.dataset.column) + 2;
-        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+        row = Number(targetElement.dataset.row) + 1;
+        column = Number(targetElement.dataset.column) + 2;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
-        row = Number(event.target.dataset.row) + 2;
-        column = Number(event.target.dataset.column) + 1;
-        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+        row = Number(targetElement.dataset.row) + 2;
+        column = Number(targetElement.dataset.column) + 1;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
-        row = Number(event.target.dataset.row) + 2;
-        column = Number(event.target.dataset.column) - 1;
-        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+        row = Number(targetElement.dataset.row) + 2;
+        column = Number(targetElement.dataset.column) - 1;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
-        row = Number(event.target.dataset.row) + 1;
-        column = Number(event.target.dataset.column) - 2;
-        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+        row = Number(targetElement.dataset.row) + 1;
+        column = Number(targetElement.dataset.column) - 2;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
-        row = Number(event.target.dataset.row) - 1;
-        column = Number(event.target.dataset.column) - 2;
-        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+        row = Number(targetElement.dataset.row) - 1;
+        column = Number(targetElement.dataset.column) - 2;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
-        row = Number(event.target.dataset.row) - 2;
-        column = Number(event.target.dataset.column) - 1;
-        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour)) {
+        row = Number(targetElement.dataset.row) - 2;
+        column = Number(targetElement.dataset.column) - 1;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
@@ -368,11 +305,11 @@ function highlightPossibleMoves(event, piece) {
         let row;
         let column;
         let status = true;
-        for (row = Number(event.target.dataset.row) - 1, column = Number(event.target.dataset.column) + 1; row >= 0, column < 8; row--, column++) {
+        for (row = Number(targetElement.dataset.row) - 1, column = Number(targetElement.dataset.column) + 1; row >= 0, column < 8; row--, column++) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -381,11 +318,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) + 1, column = Number(event.target.dataset.column) + 1; row < 8, column < 8; row++, column++) {
+        for (row = Number(targetElement.dataset.row) + 1, column = Number(targetElement.dataset.column) + 1; row < 8, column < 8; row++, column++) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -394,11 +331,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) + 1, column = Number(event.target.dataset.column) - 1; row < 8, column >= 0; row++, column--) {
+        for (row = Number(targetElement.dataset.row) + 1, column = Number(targetElement.dataset.column) - 1; row < 8, column >= 0; row++, column--) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -407,11 +344,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) - 1, column = Number(event.target.dataset.column) - 1; row >= 0, column >= 0; row--, column--) {
+        for (row = Number(targetElement.dataset.row) - 1, column = Number(targetElement.dataset.column) - 1; row >= 0, column >= 0; row--, column--) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -423,12 +360,12 @@ function highlightPossibleMoves(event, piece) {
     } else if (piece == 'Queen') {
         let status = true;
         let row;
-        let column = Number(event.target.dataset.column);
-        for (row = Number(event.target.dataset.row) - 1; row >= 0; row--) {
+        let column = Number(targetElement.dataset.column);
+        for (row = Number(targetElement.dataset.row) - 1; row >= 0; row--) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -437,11 +374,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) + 1; row < 8; row++) {
+        for (row = Number(targetElement.dataset.row) + 1; row < 8; row++) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -450,12 +387,12 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        row = Number(event.target.dataset.row);
-        for (column = Number(event.target.dataset.column) - 1; column >= 0; column--) {
+        row = Number(targetElement.dataset.row);
+        for (column = Number(targetElement.dataset.column) - 1; column >= 0; column--) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -464,11 +401,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (column = Number(event.target.dataset.column) + 1; column < 8; column++) {
+        for (column = Number(targetElement.dataset.column) + 1; column < 8; column++) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -477,11 +414,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) - 1, column = Number(event.target.dataset.column) + 1; row >= 0, column < 8; row--, column++) {
+        for (row = Number(targetElement.dataset.row) - 1, column = Number(targetElement.dataset.column) + 1; row >= 0, column < 8; row--, column++) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -490,11 +427,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) + 1, column = Number(event.target.dataset.column) + 1; row < 8, column < 8; row++, column++) {
+        for (row = Number(targetElement.dataset.row) + 1, column = Number(targetElement.dataset.column) + 1; row < 8, column < 8; row++, column++) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -503,11 +440,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) + 1, column = Number(event.target.dataset.column) - 1; row < 8, column >= 0; row++, column--) {
+        for (row = Number(targetElement.dataset.row) + 1, column = Number(targetElement.dataset.column) - 1; row < 8, column >= 0; row++, column--) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -516,11 +453,11 @@ function highlightPossibleMoves(event, piece) {
             }
         }
         status = true;
-        for (row = Number(event.target.dataset.row) - 1, column = Number(event.target.dataset.column) - 1; row >= 0, column >= 0; row--, column--) {
+        for (row = Number(targetElement.dataset.row) - 1, column = Number(targetElement.dataset.column) - 1; row >= 0, column >= 0; row--, column--) {
             if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.piece == 'Empty' && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
-            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != event.target.dataset.pieceColour && status) {
+            } else if (document.getElementById(row + '-' + column) != null && document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour && status) {
                 document.getElementById(row + '-' + column).classList.add('highlighted');
                 activeSquares.push(document.getElementById(row + '-' + column));
                 status = false;
@@ -530,55 +467,120 @@ function highlightPossibleMoves(event, piece) {
         }
         gameStatus = 1;
     } else if (piece == 'King') {
-        let row = Number(event.target.dataset.row) - 1;
-        let column = Number(event.target.dataset.column);
+        let row = Number(targetElement.dataset.row) - 1;
+        let column = Number(targetElement.dataset.column);
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
+            document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        column++;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
+            document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row++;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
+            document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row++;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
+            document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        column--;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
+            document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        column--;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
+            document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row--;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
+            document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        row--;
+        if (document.getElementById(row + '-' + column) != null && (document.getElementById(row + '-' + column).dataset.piece == 'Empty' || document.getElementById(row + '-' + column).dataset.pieceColour != targetElement.dataset.pieceColour)) {
+            document.getElementById(row + '-' + column).classList.add('highlighted');
+            activeSquares.push(document.getElementById(row + '-' + column));
+        }
+        gameStatus = 1;
     }
 }
 
 function clickHandler(event) {
-    if (gameStatus == 1) {
-        let targetElement;
-        if (event.target.tagName == 'IMG') {
-            targetElement = event.target.parentNode;
-        } else {
-            targetElement = event.target;
+    let targetElement;
+    if (event.target.tagName == 'IMG') {
+        targetElement = event.target.parentNode;
+    } else {
+        targetElement = event.target;
+    }
+    if (gameStatus == 0 && whiteTurn) {
+        if (targetElement.dataset.piece == 'Pawn' && targetElement.dataset.pieceColour == 'white' && !whitePawnBooleans[targetElement.dataset.number]) {
+            pieceToMove = targetElement;
+            targetElement.classList.add('selected');
+            highlightPossibleMoves(targetElement, 'unmoved' + targetElement.dataset.piece);
+        } else if (targetElement.dataset.pieceColour == 'white') {
+            pieceToMove = targetElement;
+            targetElement.classList.add('selected');
+            highlightPossibleMoves(targetElement, targetElement.dataset.piece);
         }
-        if (gameStatus == 1 && activeSquares.includes(targetElement)) {
-            if (targetElement.dataset.piece != 'Empty' && targetElement.dataset.pieceColour != pieceToMove.dataset.pieceColour) {
-                capturedPieceContainer.innerHTML += targetElement.innerHTML + '<br>';
-            }
-            if (pieceToMove.dataset.piece == 'Pawn') {
-                if (pieceToMove.dataset.pieceColour == 'white') {
-                    whitePawns[pieceToMove.dataset.number].moved = true;
-                    whitePawns[pieceToMove.dataset.number].row = Number(targetElement.dataset.row);
-                    whitePawns[pieceToMove.dataset.number].column = Number(targetElement.dataset.column);
-                } else {
-                    blackPawns[pieceToMove.dataset.number].moved = true;
-                    blackPawns[pieceToMove.dataset.number].row = Number(targetElement.dataset.row);
-                    blackPawns[pieceToMove.dataset.number].column = Number(targetElement.dataset.column);
-                }
-            }
-            targetElement.dataset.piece = pieceToMove.dataset.piece;
-            targetElement.dataset.pieceColour = pieceToMove.dataset.pieceColour;
-            targetElement.innerHTML = pieceToMove.innerHTML;
-            if (pieceToMove.dataset.number != undefined) {
-                targetElement.dataset.number = pieceToMove.dataset.number;
-            }
-            pieceToMove.dataset.piece = 'Empty';
-            pieceToMove.dataset.pieceColour = undefined;
-            pieceToMove.innerHTML = '';
-            whiteTurn = !whiteTurn;
-            gameStatus = 0;
-            activeSquares = [];
-            pieceToMove = undefined;
-
+    } else if (gameStatus == 0 && !whiteTurn) {
+        if (targetElement.dataset.piece == 'Pawn' && targetElement.dataset.pieceColour == 'black' && !blackPawnBooleans[targetElement.dataset.number]) {
+            pieceToMove = targetElement;
+            targetElement.classList.add('selected');
+            highlightPossibleMoves(targetElement, 'unmoved' + targetElement.dataset.piece);
+        } else if (targetElement.dataset.pieceColour == 'black') {
+            pieceToMove = targetElement;
+            targetElement.classList.add('selected');
+            highlightPossibleMoves(targetElement, targetElement.dataset.piece);
+        }
+    } else if (gameStatus == 1) {
+        if (!activeSquares.includes(targetElement)) {
             for (let i = 0; i < squareElements.length; i++) {
-                squareElements[i].classList.remove('highlighted');
+                squareElements[i].classList.remove('highlighted', 'selected');
             }
-            mouseEnterHandler(event);
+            activeSquares = [];
+            gameStatus = 0;
+        } else {
+            gameStatus = 2;
+            clickHandler(event);
+        }
+    } else if (gameStatus == 2) {
+        if (targetElement.dataset.piece != 'Empty' && targetElement.dataset.pieceColour != pieceToMove.dataset.pieceColour) {
+            capturedPieceContainer.innerHTML += targetElement.innerHTML + '<br>';
+        }
+        if (pieceToMove.dataset.piece == 'Pawn') {
+            if (pieceToMove.dataset.pieceColour == 'white') {
+                whitePawnBooleans[pieceToMove.dataset.number] = true;
+            } else {
+                blackPawnBooleans[pieceToMove.dataset.number] = true;
+            }
+        }
+        targetElement.dataset.piece = pieceToMove.dataset.piece;
+        targetElement.dataset.pieceColour = pieceToMove.dataset.pieceColour;
+        targetElement.innerHTML = pieceToMove.innerHTML;
+        if (pieceToMove.dataset.number != undefined) {
+            targetElement.dataset.number = pieceToMove.dataset.number;
+        }
+        pieceToMove.dataset.piece = 'Empty';
+        pieceToMove.dataset.pieceColour = undefined;
+        pieceToMove.innerHTML = '';
+        whiteTurn = !whiteTurn;
+        if (whiteTurn) {
+            turnDisplay.innerHTML = 'White';
+        } else {
+            turnDisplay.innerHTML = 'Black';
+        }
+        gameStatus = 0;
+        activeSquares = [];
+        pieceToMove = undefined;
+        for (let i = 0; i < squareElements.length; i++) {
+            squareElements[i].classList.remove('highlighted', 'selected');
         }
     }
-
-
-
 }

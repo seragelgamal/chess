@@ -156,7 +156,6 @@ function highlightPossibleMoves(targetElement, piece) {
                 activeSquares.push(document.getElementById(row + '-' + column));
             }
         }
-        gameStatus = 1;
     } else if (piece == 'Pawn') {
         if (whiteTurn) {
             let row = Number(targetElement.dataset.row) - 1;
@@ -192,7 +191,6 @@ function highlightPossibleMoves(targetElement, piece) {
                 }
             }
         }
-        gameStatus = 1;
     } else if (piece == 'Rook') {
         let status = true;
         let row;
@@ -250,7 +248,6 @@ function highlightPossibleMoves(targetElement, piece) {
             }
         }
         status = true;
-        gameStatus = 1;
     } else if (piece == 'Knight') {
         let row = Number(targetElement.dataset.row) - 2;
         let column = Number(targetElement.dataset.column) + 1;
@@ -300,7 +297,6 @@ function highlightPossibleMoves(targetElement, piece) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
-        gameStatus = 1;
     } else if (piece == 'Bishop') {
         let row;
         let column;
@@ -356,7 +352,6 @@ function highlightPossibleMoves(targetElement, piece) {
                 status = false;
             }
         }
-        gameStatus = 1;
     } else if (piece == 'Queen') {
         let status = true;
         let row;
@@ -465,7 +460,6 @@ function highlightPossibleMoves(targetElement, piece) {
                 status = false;
             }
         }
-        gameStatus = 1;
     } else if (piece == 'King') {
         let row = Number(targetElement.dataset.row) - 1;
         let column = Number(targetElement.dataset.column);
@@ -508,6 +502,8 @@ function highlightPossibleMoves(targetElement, piece) {
             document.getElementById(row + '-' + column).classList.add('highlighted');
             activeSquares.push(document.getElementById(row + '-' + column));
         }
+    }
+    if (gameStatus == 0) {
         gameStatus = 1;
     }
 }
@@ -552,7 +548,15 @@ function clickHandler(event) {
         }
     } else if (gameStatus == 2) {
         if (targetElement.dataset.piece != 'Empty' && targetElement.dataset.pieceColour != pieceToMove.dataset.pieceColour) {
-            capturedPieceContainer.innerHTML += targetElement.innerHTML + '<br>';
+            capturedPieceContainer.innerHTML += targetElement.innerHTML;
+        }
+        if (targetElement.dataset.piece == 'King') {
+            if (whiteTurn) {
+                alert('GAME OVER: White has won');
+            } else {
+                alert('GAME OVER: Black has won');
+            }
+            location.reload();
         }
         if (pieceToMove.dataset.piece == 'Pawn') {
             if (pieceToMove.dataset.pieceColour == 'white') {
@@ -570,6 +574,14 @@ function clickHandler(event) {
         pieceToMove.dataset.piece = 'Empty';
         pieceToMove.dataset.pieceColour = undefined;
         pieceToMove.innerHTML = '';
+        activeSquares = [];
+        for (let i = 0; i < squareElements.length; i++) {
+            squareElements[i].classList.remove('highlighted', 'selected');
+        }
+        checkPawnPromotion();
+        gameStatus = 3;
+        checkForCheck(targetElement);
+        pieceToMove = undefined;
         whiteTurn = !whiteTurn;
         if (whiteTurn) {
             turnDisplay.innerHTML = 'White';
@@ -577,10 +589,56 @@ function clickHandler(event) {
             turnDisplay.innerHTML = 'Black';
         }
         gameStatus = 0;
-        activeSquares = [];
-        pieceToMove = undefined;
-        for (let i = 0; i < squareElements.length; i++) {
-            squareElements[i].classList.remove('highlighted', 'selected');
+    }
+}
+
+function checkPawnPromotion() {
+    let row = 0;
+    for (let column = 0; column < 8; column++) {
+        if (document.getElementById(row + '-' + column).dataset.piece == 'Pawn' && document.getElementById(row + '-' + column).dataset.pieceColour == 'white') {
+            pawnPromotion('white', row, column);
         }
     }
+    row = 7;
+    for (let column = 0; column < 8; column++) {
+        if (document.getElementById(row + '-' + column).dataset.piece == 'Pawn' && document.getElementById(row + '-' + column).dataset.pieceColour == 'black') {
+            pawnPromotion('black', row, column);
+        }
+    }
+}
+
+function pawnPromotion(colour, row, column) {
+    document.getElementById(row + '-' + column).dataset.piece = 'Queen';
+    delete blackPawnBooleans[document.getElementById(row + '-' + column).dataset.number];
+    delete document.getElementById(row + '-' + column).dataset.number;
+    document.getElementById(row + '-' + column).innerHTML = '<img src="media/' + colour + 'Queen.png"></img>';
+    alert('The pawn at row ' + row + ', column ' + column + ' has been promoted');
+}
+
+function checkForCheck(targetElement) {
+    highlightPossibleMoves(targetElement, targetElement.dataset.piece);
+    pieceToMove = undefined;
+    if (activeSquares.length > 0) {
+        for (let i = 0; i < activeSquares.length; i++) {
+            if (activeSquares[i].dataset.piece == 'King' && activeSquares[i].dataset.piece != targetElement.dataset.pieceColour) {
+                // if (checkForCheckmate()) {
+                //     alert('CHECKMATE');
+                // } else {
+                alert('CHECK');
+                // }
+            }
+        }
+    }
+    activeSquares = [];
+    for (let i = 0; i < squareElements.length; i++) {
+        squareElements[i].classList.remove('highlighted', 'selected');
+    }
+    pieceToMove = undefined;
+}
+
+while (gameStatus == 3) {
+    for (let i = 0; i < squareElements.length; i++) {
+        squareElements[i].classList.remove('highlighted', 'selected');
+    }
+    pieceToMove = undefined;
 }

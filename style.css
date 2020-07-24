@@ -4,16 +4,17 @@
 
 .left {
     float: left;
-    width: 80%;
+    width: auto;
 }
 
 .right {
-    float: right;
+    /* float: right; */
     text-align: center;
-    width: 20%;
+    width: auto;
 }
 
-.white, .brown {
+.white,
+.brown {
     float: left;
     width: 98px;
     height: 98px;
@@ -44,7 +45,8 @@ img {
     height: 80px;
 }
 
-.highlighted img, .selected img {
+.highlighted img,
+.selected img {
     width: 80px;
 }
 
@@ -57,4 +59,8 @@ p {
     border: 10px solid red;
     width: 80px;
     height: 80px;
+}
+
+.turn {
+    font-size: 50px;
 }

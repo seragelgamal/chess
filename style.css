@@ -1,5 +1,6 @@
 * {
     text-align: center;
+    font-family: 'Mulish', sans-serif;
 }
 
 .left {
@@ -25,6 +26,8 @@
     width: 800px;
     height: 800px;
     display: block;
+    margin: 20px;
+    border: 10px solid rgb(255, 196, 1);
 }
 
 .white {

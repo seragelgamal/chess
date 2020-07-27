@@ -278,8 +278,7 @@ function highlightSquare(row, column) {
     activeSquares.push(document.getElementById(row + '-' + column));
 }
 
-
-// because a queen's movement is a combination of a rook and a bishop, functions have been made for their movement so that when highlighting a queen's possible moves, the program can simply call both funtions
+// because a queen's movement is a combination of a rook and a bishop, functions have been made for the highlighting of their moves so that when highlighting a queen's possible moves, the program can simply call both funtions
 function highlightRookMoves(targetElement) {
     let status = true;
     let row;
@@ -422,7 +421,7 @@ while (gameStatus == 3) {
     pieceToMove = undefined;
 }
 
-// checks if any kings are in check (LIMITED FUNCTIONALITY)
+// checks if the opposing side's king is in check (LIMITED FUNCTIONALITY)
 function checkForCheck(targetElement) {
     // find the new possible moves of the piece that has just been moved
     // the pieces won't actually be highlighted because the game status is 3, so all of this is done in the background

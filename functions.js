@@ -12,14 +12,13 @@ let pieceToMove;
 
 // click event handler
 function clickHandler(event) {
-    // make sure the code focuses on the actual div, not the piece if there is one
+    // make sure the program focuses on the actual div, not the <img> element of the piece if there is one
     let targetElement;
     if (event.target.tagName == 'IMG') {
         targetElement = event.target.parentNode;
     } else {
         targetElement = event.target;
     }
-
 
     if (gameStatus == 0 && whiteTurn) {
         // if game status is 0 (no piece selected) and a click is detected then highlight the moves for the piece that's clicked
@@ -396,7 +395,7 @@ function checkForPawnPromotion() {
 }
 
 function pawnPromotion(colour, row, column) {
-    // ask the player what piece he wants to promote the pawn to
+    // ask the player what piece they want to promote the pawn to
     let newPiece = prompt('Choose a piece (queen, bishop, or rook) to promote this pawn to:', 'queen');
     newPiece = newPiece.toLowerCase();
     newPiece = newPiece.trim();
